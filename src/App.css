@@ -1,0 +1,26 @@
+h1 {
+    text-align: center;
+    color: #738d95;
+    margin-bottom: 15px;
+}
+
+.add-new-user {
+    text-align: center;
+}
+
+.add-new-user-btn {
+    font-size: 1em;
+    background-color: #8ad7bd;
+    border: 0;
+    padding: 15px;
+    margin-bottom: 15px;
+}
+
+.add-new-user-btn:focus {
+    outline: none;
+}
+
+.add-new-user-btn:hover {
+    box-shadow: 0 0 3pt 2pt cornflowerblue;
+    cursor: pointer;
+}
