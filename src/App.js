@@ -1,6 +1,7 @@
 import React from 'react';
 import UserCardList from './components/usercardlist/usercardlist';
 import AddUserPage from './components/adduserpage/adduserpage';
+import InfoPopup from './components/infopopup/infopopup';
 import './App.css';
 
 class App extends React.Component {
@@ -9,7 +10,11 @@ class App extends React.Component {
 
 		this.state = {
 			allusers: [],
-			displayAddUser: false
+			displayAddUserModal: false,
+			info: {
+				message: "",
+				visible: false
+			}
 		}
 	}
 
@@ -17,53 +22,109 @@ class App extends React.Component {
 		this.updateUser();
 	}
 
-	updateUser = () => {
+	updateUser = (resp={message: ""}) => {
         fetch("http://15.207.229.231:8000/machstatz/get_all_users")
         .then(resp => resp.json())
-        .then(users => this.setState({allusers: users}))
-        .catch(error => console.log(error));
+        .then(users => this.setState({
+			allusers: users,
+			info: {
+				message: resp.message,
+				visible: resp.message?true:false
+			}
+		}))
+        .catch(error => {
+			this.handleCatchBlocks();
+			console.log(error);
+		});
+
+		if(resp.message) {
+			this.handleInfoTimeout();
+		}
+
+
+		// this.setState({
+		// 	allusers: userData1,
+		// 	info: {
+		// 		message: resp.message,
+		// 		visible: resp.message?true:false
+		// 	}
+		// })
+
+		// this.handleInfoTimeout(resp.message);		
     }
 
 	handleUserDelete = async (email) => {
-        const resp = await fetch("http://15.207.229.231:8000/machstatz/delete_existing_user?email=" + email,
-        {
-            method: "DELETE",
-        } 
-        );
+		try {
+			const resp = await fetch("http://15.207.229.231:8000/machstatz/delete_existing_user?email=" + email,
+			{
+				method: "DELETE",
+			} 
+			);
+			
+			const sorfresp = await resp.json();
+			console.log(sorfresp)
+			
+			this.updateUser(sorfresp);
+		} catch(error) {
+			this.handleCatchBlocks();
+			console.log(error);
+		}
         
-        const data = await resp.json();
-        console.log(data)
-        
-        this.updateUser();
     }
 
 	handleUserAdd = async (userToAdd) => {
+		try {
+			const resp = await fetch("http://15.207.229.231:8000/machstatz/add_new_user",
+			{
+				method: "POST",
+				body: JSON.stringify(userToAdd),
+				headers: new Headers({"Content-Type": "application/json"})
+			});
 
-		const resp = await fetch("http://15.207.229.231:8000/machstatz/add_new_user",
-		{
-			method: "POST",
-			body: JSON.stringify(userToAdd),
-			headers: new Headers({"Content-Type": "application/json"})
-		});
+			const sorfresp = await resp.json();
+			console.log(sorfresp);
 
-        const data = await resp.json();
-		console.log(data);
-
-		this.updateUser();
+			this.updateUser(sorfresp);
+		} catch(err) {
+			this.handleCatchBlocks();
+			console.log(err);
+		}
+		
 	}
 
-	handleAddUserDisplay = (status) => {
-		this.setState({displayAddUser: status})
+	handleAddUserModal = (status) => {
+		this.setState({displayAddUserModal: status})
+	}
+
+	handleInfoTimeout = () => {
+		setTimeout(() => {
+			this.setState({
+				info: {
+					message: "",
+					visible: false
+				}
+			});
+		}, 4000);
+	}
+
+	handleCatchBlocks = () => {
+		this.setState({
+			info: {
+				message: "Please, check your internet connection and try again",
+				visible: true
+			}
+		});
+		this.handleInfoTimeout(true);
 	}
 
 	render() {
 		return (
-			<div>
+			<div className="app">
 				<h1>User Management System</h1>
 				<div className="add-new-user">
 					<button 
 						className="add-new-user-btn"
-						onClick={() => this.handleAddUserDisplay(true)}
+						onClick={() => this.handleAddUserModal(true)}
 					>
 						<h3>AddNewUser</h3>
 					</button>
@@ -73,13 +134,23 @@ class App extends React.Component {
 					allusers={this.state.allusers}
 				/>
 				
-				{this.state.displayAddUser
+				{this.state.displayAddUserModal
 				?
 				<AddUserPage
 					handleUserAdd={this.handleUserAdd}
-					handleAddUserDisplayStatus={this.handleAddUserDisplay}
+					handleAddUserModal={this.handleAddUserModal}
 				/>
 				: null
+				}
+
+				{
+					this.state.info.visible
+					?
+					<InfoPopup 
+						message={this.state.info.message}
+					/>
+					:
+					null
 				}
 			</div>
 			

@@ -43,7 +43,7 @@ class AddUserPage extends React.Component {
             }
         );
 
-        this.props.handleAddUserDisplayStatus(false);
+        this.props.handleAddUserModal(false);
     }
 
     render() {
@@ -54,7 +54,7 @@ class AddUserPage extends React.Component {
                         <h2>Add user</h2>
                         <button
                             className="close-modal"
-                            onClick={() => this.props.handleAddUserDisplayStatus(false)}
+                            onClick={() => this.props.handleAddUserModal(false)}
                         >
                             <i className="fas fa-window-close"></i>
                         </button>
@@ -131,7 +131,7 @@ class AddUserPage extends React.Component {
                         </div>
                         
                         <div className="submit-cancel-btns">
-                            <button type="button" onClick={() => this.props.handleAddUserDisplayStatus(false)}>
+                            <button type="button" className="cancel-btn"onClick={() => this.props.handleAddUserModal(false)}>
                                 Cancel
                             </button>
 
