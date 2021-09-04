@@ -39,18 +39,7 @@ class App extends React.Component {
 
 		if(resp.message) {
 			this.handleInfoTimeout();
-		}
-
-
-		// this.setState({
-		// 	allusers: userData1,
-		// 	info: {
-		// 		message: resp.message,
-		// 		visible: resp.message?true:false
-		// 	}
-		// })
-
-		// this.handleInfoTimeout(resp.message);		
+		}	
     }
 
 	handleUserDelete = async (email) => {
@@ -114,7 +103,7 @@ class App extends React.Component {
 				visible: true
 			}
 		});
-		this.handleInfoTimeout(true);
+		this.handleInfoTimeout();
 	}
 
 	render() {
