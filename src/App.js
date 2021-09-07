@@ -14,7 +14,8 @@ class App extends React.Component {
 			info: {
 				message: "",
 				visible: false
-			}
+			},
+			nousermessage: ""
 		}
 	}
 
@@ -30,7 +31,8 @@ class App extends React.Component {
 			info: {
 				message: resp.message,
 				visible: resp.message?true:false
-			}
+			},
+			nousermessage: users.length?"":"There are no users stored in the system, please use above button to add a new user"			
 		}))
         .catch(error => {
 			this.handleCatchBlocks();
@@ -101,7 +103,7 @@ class App extends React.Component {
 			info: {
 				message: "Please, check your internet connection and try again",
 				visible: true
-			}
+			}		
 		});
 		this.handleInfoTimeout();
 	}
@@ -118,10 +120,27 @@ class App extends React.Component {
 						<h3>AddNewUser</h3>
 					</button>
 				</div>
-				<UserCardList 
-					handleUserDelete={this.handleUserDelete}
-					allusers={this.state.allusers}
-				/>
+
+				{
+					this.state.allusers.length
+					?
+					<UserCardList 
+						handleUserDelete={this.handleUserDelete}
+						allusers={this.state.allusers}
+					/>
+					:
+					<div>
+						<p 
+							style={
+								{
+									textAlign: 'center',
+									padding: '10px'
+								}
+							}
+						>{this.state.nousermessage}</p>
+					</div>
+				}
+				
 				
 				{this.state.displayAddUserModal
 				?
