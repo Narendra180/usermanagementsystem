@@ -11,7 +11,7 @@ class App extends React.Component {
 		this.state = {
 			allusers: [],
 			displayAddUserModal: false,
-			info: {
+			popupinfo: {
 				message: "",
 				visible: false
 			},
@@ -20,67 +20,65 @@ class App extends React.Component {
 	}
 
 	componentDidMount() {
-		this.updateUser();
+		let stringOfUsersInLocalStorage = localStorage.getItem("users");
+		if(stringOfUsersInLocalStorage) {
+			this.setState(
+				{allusers: JSON.parse(stringOfUsersInLocalStorage)}
+			);
+		}
 	}
 
-	updateUser = (resp={message: ""}) => {
-        fetch("http://15.207.229.231:8000/machstatz/get_all_users")
-        .then(resp => resp.json())
-        .then(users => this.setState({
-			allusers: users,
-			info: {
-				message: resp.message,
-				visible: resp.message?true:false
-			},
-			nousermessage: users.length?"":"There are no users stored in the system, please use above button to add a new user"			
-		}))
-        .catch(error => {
-			this.handleCatchBlocks();
-			console.log(error);
+	handleUserDelete = (id) => {
+		let filteredUsers = this.state.allusers.filter((user) => {
+			return user.id !== id;
+		});
+        
+		this.setState(() => {
+			return {
+				allusers: filteredUsers,
+				popupinfo: {
+					message: "user deleted successfully",
+					visible: true
+				}
+			}
+		}, () => {
+			this.saveStateTolocalStorage();
 		});
 
-		if(resp.message) {
-			this.handleInfoTimeout();
-		}	
+		this.handleInfoTimeout();
     }
 
-	handleUserDelete = async (email) => {
-		try {
-			const resp = await fetch("http://15.207.229.231:8000/machstatz/delete_existing_user?email=" + email,
-			{
-				method: "DELETE",
-			} 
+	handleUserAdd = (userToAdd) => {
+		let users = this.state.allusers;
+		let existingUserIndex = users.findIndex((user) => {
+			return (user.username === userToAdd.username) || (user.email === userToAdd.email)
+		});
+		
+		if(existingUserIndex < 0) {
+			users.push(userToAdd);
+			this.setState(
+				() => {
+					return {
+						allusers: users,
+						popupinfo: {
+							message: "user added successfully",
+							visible: true
+						}
+					}
+				},
+				() => this.saveStateTolocalStorage()
 			);
-			
-			const sorfresp = await resp.json();
-			console.log(sorfresp)
-			
-			this.updateUser(sorfresp);
-		} catch(error) {
-			this.handleCatchBlocks();
-			console.log(error);
-		}
-        
-    }
-
-	handleUserAdd = async (userToAdd) => {
-		try {
-			const resp = await fetch("http://15.207.229.231:8000/machstatz/add_new_user",
-			{
-				method: "POST",
-				body: JSON.stringify(userToAdd),
-				headers: new Headers({"Content-Type": "application/json"})
+		} else {
+			this.setState({
+				popupinfo: {
+					message: "username or email already exists",
+					visible: true
+				}
 			});
-
-			const sorfresp = await resp.json();
-			console.log(sorfresp);
-
-			this.updateUser(sorfresp);
-		} catch(err) {
-			this.handleCatchBlocks();
-			console.log(err);
 		}
 		
+		this.handleInfoTimeout();
+		this.saveStateTolocalStorage();
 	}
 
 	handleAddUserModal = (status) => {
@@ -90,7 +88,7 @@ class App extends React.Component {
 	handleInfoTimeout = () => {
 		setTimeout(() => {
 			this.setState({
-				info: {
+				popupinfo: {
 					message: "",
 					visible: false
 				}
@@ -98,14 +96,9 @@ class App extends React.Component {
 		}, 4000);
 	}
 
-	handleCatchBlocks = () => {
-		this.setState({
-			info: {
-				message: "Please, check your internet connection and try again",
-				visible: true
-			}		
-		});
-		this.handleInfoTimeout();
+	saveStateTolocalStorage = () => {
+		let dataToStore = JSON.stringify(this.state.allusers);
+		localStorage.setItem("users",dataToStore);
 	}
 
 	render() {
@@ -137,7 +130,7 @@ class App extends React.Component {
 									padding: '10px'
 								}
 							}
-						>{this.state.nousermessage}</p>
+						>No users available, add new users by using above button</p>
 					</div>
 				}
 				
@@ -152,10 +145,10 @@ class App extends React.Component {
 				}
 
 				{
-					this.state.info.visible
+					this.state.popupinfo.visible
 					?
 					<InfoPopup 
-						message={this.state.info.message}
+						message={this.state.popupinfo.message}
 					/>
 					:
 					null

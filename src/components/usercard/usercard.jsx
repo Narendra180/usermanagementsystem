@@ -1,12 +1,12 @@
 import './usercard.css';
 
-export default function UserCard({username, email, handleUserDelete}) {
+export default function UserCard({username, email, handleUserDelete, id}) {
     return (
         <div className="user-card">
             <div className="btn-div">
                 <button 
                 className="delete-btn"
-                onClick={() => handleUserDelete(email)}
+                onClick={() => handleUserDelete(id)}
                 >
                     <i className="fas fa-trash-alt"></i>
                 </button>

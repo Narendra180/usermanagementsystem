@@ -9,7 +9,7 @@ function UserCardList({allusers,handleUserDelete}) {
                 allusers.map(user => {
                     return (
                         <UserCard 
-                        key={user._id.$oid} 
+                        key={user.id} 
                         {...user}
                         handleUserDelete={handleUserDelete}
                         />

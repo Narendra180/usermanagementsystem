@@ -1,4 +1,5 @@
 import React from 'react';
+import { v4 as uuidv4 }  from 'uuid';
 import './adduserpage.css';
 
 class AddUserPage extends React.Component {
@@ -10,8 +11,15 @@ class AddUserPage extends React.Component {
             lastname: '',
             username: '',
             email: '',
-            password: ''
+            password: '',
+            id: ''
         }
+
+        this.textInput = React.createRef();
+    }
+
+    componentDidMount() {
+        this.textInput.current.focus();
     }
 
     handleChange = (e) => {
@@ -29,7 +37,8 @@ class AddUserPage extends React.Component {
                 fist_name: this.state.firstname,
                 last_name: this.state.lastname,
                 pwd: this.state.password,
-                username: this.state.username
+                username: this.state.username,
+                id: uuidv4()
             }
         );
 
@@ -74,6 +83,7 @@ class AddUserPage extends React.Component {
                                 value={this.state.firstname} 
                                 onChange={this.handleChange}
                                 placeholder="Enter your first name"
+                                ref={this.textInput}
                                 required
                             />
                         </div>
