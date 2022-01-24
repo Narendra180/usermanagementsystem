@@ -1,3 +1,7 @@
+Simple React Web App that stores user data in browser local storage and display the users and we can delete the user by using delete icon on user.
+User can be added by using the addnewuser button
+
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
